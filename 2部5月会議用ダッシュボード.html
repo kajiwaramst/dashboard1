@@ -1,0 +1,463 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f5f4f1;color:#181313;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif}
+.outer{max-width:900px;margin:0 auto;padding:1.5rem 1rem}
+.nav{display:flex;gap:0;border-bottom:2px solid #181313;margin-bottom:1.5rem;overflow-x:auto;background:#fff}
+.ntab{padding:10px 16px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;letter-spacing:.02em;transition:all .15s}
+.ntab.on{color:#E53225;border-bottom-color:#E53225}
+.ntab:hover:not(.on){color:#181313}
+.pnl{display:none}.pnl.on{display:block}
+.card{background:#fff;border:1px solid #e0ddd6;border-radius:4px;padding:20px 22px;position:relative;margin-bottom:16px}
+.card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:#E53225;border-radius:4px 0 0 4px}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.hcard-label{font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.08em}
+.hcard-val{font-size:30px;font-weight:500;color:#181313;line-height:1.1}
+.hcard-unit{font-size:11px;color:#aaa;margin-top:2px}
+.hcard-rows{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid #ebe9e4}
+.mini-label{font-size:10px;color:#888;margin-bottom:3px;letter-spacing:.03em}
+.mini-val{font-size:18px;font-weight:500}
+.badge{display:inline-block;padding:3px 9px;border-radius:2px;font-size:11px;font-weight:500;margin-top:5px}
+.ok{background:#181313;color:#fff}.ng{background:#E53225;color:#fff}
+.sec-label{font-size:10px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.1em;border-left:3px solid #E53225;padding-left:8px;margin:20px 0 12px}
+.prog-row{margin-bottom:14px}
+.prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.prog-name{font-size:13px;color:#181313;font-weight:500}
+.prog-meta{font-size:11px;color:#aaa}
+.prog-pct{font-size:13px;font-weight:500;margin-left:8px}
+.bar-bg{height:7px;background:#ebe9e4;position:relative;overflow:visible;border-radius:2px}
+.bar-fill{height:100%;border-radius:2px}
+.divider{height:1px;background:#ebe9e4;margin:18px 0}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:#888;margin-bottom:10px}
+.leg span{display:flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;flex-shrink:0;border-radius:1px}
+.chart-wrap{position:relative;width:100%;height:250px;margin-top:4px}
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi-box{background:#fff;border:1px solid #e0ddd6;border-radius:4px;padding:12px 14px;text-align:center}
+.kpi-box-label{font-size:10px;color:#888;margin-bottom:4px;letter-spacing:.04em}
+.kpi-box-val{font-size:20px;font-weight:500;color:#181313}
+.kpi-box-sub{font-size:11px;margin-top:3px}
+.tbl-card{background:#fff;border:1px solid #e0ddd6;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.tbl-head-bar{background:#181313;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.tbl-head-bar span{font-size:12px;color:#fff;font-weight:500;letter-spacing:.04em}
+.tbl-wrap{overflow-x:auto}
+
+/* テーブル本体 */
+table.dt{width:100%;border-collapse:collapse;font-size:12px;min-width:660px}
+table.dt td,table.dt th{padding:7px 11px;white-space:nowrap;border-bottom:1px solid #f0ede8;border-right:1px solid #f0ede8}
+table.dt td:last-child,table.dt th:last-child{border-right:none}
+table.dt tbody tr:hover td{background:#fdf9f8}
+table.dt tr.total-row td{background:#f8f6f3;font-weight:500;border-top:2px solid #181313;border-bottom:none}
+
+/* ヘッダー段 */
+table.dt thead tr.grp th{font-size:11px;font-weight:500;text-align:center;padding:6px 8px;color:#fff;letter-spacing:.04em}
+table.dt thead tr.sub th{font-size:10px;font-weight:500;text-align:right;padding:5px 11px;color:#ddd;letter-spacing:.03em}
+table.dt thead tr.sub th:first-child,table.dt thead tr.grp th:first-child{text-align:left}
+table.dt td{text-align:right;color:#181313}
+table.dt td:first-child{text-align:left}
+
+/* 売上ゾーン（赤系ヘッダー） */
+.th-s{background:#7a1a10}
+/* 粗利ゾーン（青系ヘッダー） */
+.th-p{background:#1a3a6b}
+/* 基本ヘッダー */
+.th-base{background:#2c2c2a}
+/* 列背景うっすら */
+table.dt td.col-s{background:#fffbfb}
+table.dt td.col-p{background:#f7faff}
+table.dt tr.total-row td.col-s{background:#fff0ee}
+table.dt tr.total-row td.col-p{background:#edf2ff}
+
+/* 達成率バッジ */
+.rb{display:inline-block;padding:2px 7px;border-radius:2px;font-size:11px;font-weight:500;min-width:52px;text-align:center}
+.rb-ok{background:#e8f4e8;color:#1a6b1a}
+.rb-ng{background:#fdeaea;color:#c0392b}
+.rb-na{background:#f0ede8;color:#aaa}
+/* 差異 */
+.dp{color:#1a6b1a;font-weight:500}
+.dn{color:#E53225;font-weight:500}
+.dz{color:#aaa}
+</style>
+
+<div class="outer">
+<div class="nav">
+  <button class="ntab on"  onclick="sw('p_apr',this)">① 4月</button>
+  <button class="ntab" onclick="sw('p_may',this)">② 5月</button>
+  <button class="ntab" onclick="sw('p_q1',this)">③ Q1累計</button>
+  <button class="ntab" onclick="sw('p_all',this)">④ 通期累計</button>
+  <button class="ntab" onclick="sw('p_k1',this)">⑤ 個人別_累計</button>
+  <button class="ntab" onclick="sw('p_a1',this)">⑥ アカウント_累計</button>
+  <button class="ntab" onclick="sw('p_k2',this)">⑦ 個人別_年間</button>
+  <button class="ntab" onclick="sw('p_a2',this)">⑧ アカウント_年間</button>
+</div>
+
+<div id="p_apr" class="pnl on" data-key="a"></div>
+<div id="p_may" class="pnl" data-key="b"></div>
+<div id="p_q1"  class="pnl" data-key="c"></div>
+<div id="p_all" class="pnl" data-key="d"></div>
+
+<div id="p_k1" class="pnl">
+  <div class="kpi-strip" id="kpi_k1"></div>
+  <div class="sec-label">売上 — 個人別達成状況</div>
+  <div class="chart-wrap" style="height:240px"><canvas id="ck1" role="img" aria-label="個人別累計売上比較"></canvas></div>
+  <div class="tbl-card" style="margin-top:16px">
+    <div class="tbl-head-bar"><span>個人別 累計予算対実績（2025年7月〜2026年4月）</span><span style="font-size:11px;color:#aaa">単位：千円</span></div>
+    <div class="tbl-wrap"><table class="dt" id="tbl_k1"></table></div>
+  </div>
+</div>
+
+<div id="p_a1" class="pnl">
+  <div class="kpi-strip" id="kpi_a1"></div>
+  <div class="tbl-card">
+    <div class="tbl-head-bar"><span>アカウント別 累計予算対実績（2025年7月〜2026年4月）</span><span style="font-size:11px;color:#aaa">実績降順 / 単位：千円</span></div>
+    <div class="tbl-wrap"><table class="dt" id="tbl_a1"></table></div>
+  </div>
+</div>
+
+<div id="p_k2" class="pnl">
+  <div class="kpi-strip" id="kpi_k2"></div>
+  <div class="sec-label">売上 — 個人別達成状況（年間）</div>
+  <div class="chart-wrap" style="height:240px"><canvas id="ck2" role="img" aria-label="個人別年間売上比較"></canvas></div>
+  <div class="tbl-card" style="margin-top:16px">
+    <div class="tbl-head-bar"><span>個人別 年間予算・見込＋実績（2025年7月〜2026年6月）</span><span style="font-size:11px;color:#aaa">単位：千円</span></div>
+    <div class="tbl-wrap"><table class="dt" id="tbl_k2"></table></div>
+  </div>
+</div>
+
+<div id="p_a2" class="pnl">
+  <div class="kpi-strip" id="kpi_a2"></div>
+  <div class="tbl-card">
+    <div class="tbl-head-bar"><span>アカウント別 年間予算・見込＋実績（2025年7月〜2026年6月）</span><span style="font-size:11px;color:#aaa">実績降順 / 単位：千円</span></div>
+    <div class="tbl-wrap"><table class="dt" id="tbl_a2"></table></div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const RC='#E53225',BC='#b2b0aa',CC='#4A90D9',GC='#4a9e6b';
+
+const BDATA={
+  a:{title:'2026年4月',labels:['売上','粗利'],actual:[68613,18661],hissatsu:[55905,11051],challenge:[65105,12761],jukki:[48095,9737],
+     s:{val:68613,h_r:122.7,c_r:105.4,y_r:142.7,hOk:true,cOk:true},p:{val:18661,h_r:168.9,c_r:146.2,y_r:191.7,hOk:true,cOk:true},
+     prog:[{n:'売上 vs 必達',a:68613,b:55905,r:122.7,ok:true},{n:'売上 vs チャレンジ',a:68613,b:65105,r:105.4,ok:true},{n:'粗利 vs 必達',a:18661,b:11051,r:168.9,ok:true},{n:'粗利 vs チャレンジ',a:18661,b:12761,r:146.2,ok:true}]},
+  b:{title:'2026年5月',labels:['売上','粗利'],actual:[43873,8505],hissatsu:[44500,8770],challenge:[52010,10142],jukki:[42786,8805],
+     s:{val:43873,h_r:98.6,c_r:84.4,y_r:102.5,hOk:false,cOk:false},p:{val:8505,h_r:97.0,c_r:83.9,y_r:96.6,hOk:false,cOk:false},
+     prog:[{n:'売上 vs 必達',a:43873,b:44500,r:98.6,ok:false},{n:'売上 vs チャレンジ',a:43873,b:52010,r:84.4,ok:false},{n:'粗利 vs 必達',a:8505,b:8770,r:97.0,ok:false},{n:'粗利 vs チャレンジ',a:8505,b:10142,r:83.9,ok:false}]},
+  c:{title:'Q1累計（4〜6月）',labels:['売上','粗利'],actual:[155994,35320],hissatsu:[139265,27462],challenge:[162975,31814],jukki:[128704,26459],
+     s:{val:155994,h_r:112.0,c_r:95.7,y_r:121.2,hOk:true,cOk:false},p:{val:35320,h_r:128.6,c_r:111.0,y_r:133.5,hOk:true,cOk:true},
+     prog:[{n:'売上 vs 必達',a:155994,b:139265,r:112.0,ok:true},{n:'売上 vs チャレンジ',a:155994,b:162975,r:95.7,ok:false},{n:'粗利 vs 必達',a:35320,b:27462,r:128.6,ok:true},{n:'粗利 vs チャレンジ',a:35320,b:31814,r:111.0,ok:true}]},
+  d:{title:'通期累計（7月〜6月）',labels:['売上','粗利'],actual:[624201,138911],hissatsu:[526650,107435],challenge:[606600,122395],jukki:[454330,90724],
+     s:{val:624201,h_r:118.5,c_r:102.9,y_r:137.4,hOk:true,cOk:true},p:{val:138911,h_r:129.3,c_r:113.5,y_r:153.1,hOk:true,cOk:true},
+     prog:[{n:'売上 vs 必達',a:624201,b:526650,r:118.5,ok:true},{n:'売上 vs チャレンジ',a:624201,b:606600,r:102.9,ok:true},{n:'粗利 vs 必達',a:138911,b:107435,r:129.3,ok:true},{n:'粗利 vs チャレンジ',a:138911,b:122395,r:113.5,ok:true}]}
+};
+
+const K1=[
+  {name:'梶原雅俊', sy:16500,sj:27957,sr:169.4,sd:11457,py:5860,pj:8680,pr:148.1,pd:2820,ri:31.0},
+  {name:'深澤陽介',  sy:9000, sj:12546,sr:139.4,sd:3546, py:4200,pj:5627,pr:134.0,pd:1427,ri:44.9},
+  {name:'土屋絵理',  sy:94090,sj:142604,sr:151.6,sd:48514,py:27866,pj:47166,pr:169.3,pd:19300,ri:33.1},
+  {name:'金野佳奈子',sy:132056,sj:186941,sr:141.6,sd:54885,py:22806,pj:33722,pr:147.9,pd:10916,ri:18.0},
+  {name:'木村鳳友',  sy:191600,sj:166120,sr:86.7,sd:-25480,py:30864,pj:26394,pr:85.5,pd:-4470,ri:15.9},
+  {name:'合計',     sy:443246,sj:536168,sr:121.0,sd:92922,py:91596,pj:121589,pr:132.7,pd:29993,ri:22.7}
+];
+const K2=[
+  {name:'梶原雅俊', sy:19800, sj:29757, sr:150.3,sd:9957, py:7020, pj:8980, pr:127.9,pd:1960, ri:30.2},
+  {name:'深澤陽介',  sy:10800, sj:14746, sr:136.5,sd:3946, py:5040, pj:7467, pr:148.2,pd:2427, ri:50.6},
+  {name:'土屋絵理',  sy:113350,sj:171920,sr:151.7,sd:58570,py:32198,pj:52647,pr:163.5,pd:20449,ri:30.6},
+  {name:'金野佳奈子',sy:153176,sj:216294,sr:141.2,sd:63118,py:26848,pj:38948,pr:145.1,pd:12100,ri:18.0},
+  {name:'木村鳳友',  sy:229480,sj:190830,sr:83.2,sd:-38650,py:37010,pj:30206,pr:81.6,pd:-6804,ri:15.8},
+  {name:'合計',     sy:526606,sj:623547,sr:118.4,sd:96941,py:108116,pj:138248,pr:127.9,pd:30132,ri:22.2}
+];
+
+const A1=[
+  {a:"電通西日本 ローソン",t:"土屋・梶原・金野",sy:39300,sj:100000,sr:254.5,sd:60700,py:14280,pj:29436,pr:206.1,pd:15156,ri:29.4},
+  {a:"迅速片付け屋",t:"木村鳳友",sy:65600,sj:65915,sr:100.5,sd:315,py:5904,pj:6551,pr:111.0,pd:647,ri:9.9},
+  {a:"PTかんたんでんき",t:"木村鳳友",sy:80000,sj:61653,sr:77.1,sd:-18347,py:12000,pj:8792,pr:73.3,pd:-3208,ri:14.3},
+  {a:"ピアス アクセーヌ",t:"木村・金野",sy:34000,sj:51592,sr:151.7,sd:17592,py:5780,pj:10046,pr:173.8,pd:4266,ri:19.5},
+  {a:"KDDIあんしんウォッチャー",t:"土屋・金野",sy:48940,sj:48089,sr:98.3,sd:-851,py:9896,pj:11541,pr:116.6,pd:1645,ri:24.0},
+  {a:"チムスピ チームスピリット",t:"土屋絵理",sy:0,sj:21951,sr:'--',sd:21951,py:0,pj:3059,pr:'--',pd:3059,ri:13.9},
+  {a:"KDDI自転車サポート",t:"土屋・金野",sy:19950,sj:19686,sr:98.7,sd:-264,py:4110,pj:4918,pr:119.7,pd:808,ri:25.0},
+  {a:"大和コネクト証券",t:"梶原・金野",sy:26000,sj:17896,sr:68.8,sd:-8104,py:2600,pj:2380,pr:91.5,pd:-220,ri:13.3},
+  {a:"ベクトル フクウロ",t:"土屋絵理",sy:17000,sj:17566,sr:103.3,sd:566,py:3400,pj:3474,pr:102.2,pd:74,ri:19.8},
+  {a:"AGAヘアクリニック",t:"木村・金野",sy:20700,sj:14784,sr:71.4,sd:-5916,py:4140,pj:2031,pr:49.1,pd:-2109,ri:13.7},
+  {a:"電通西日本 中国銀行",t:"木村・金野",sy:9950,sj:12652,sr:127.2,sd:2702,py:6125,pj:7039,pr:114.9,pd:914,ri:55.6},
+  {a:"C&R HightFive",t:"木村・金野",sy:10000,sj:11800,sr:118.0,sd:1800,py:2000,pj:3562,pr:178.1,pd:1562,ri:30.2},
+  {a:"DLsite",t:"深澤陽介",sy:8000,sj:10010,sr:125.1,sd:2010,py:4000,pj:4887,pr:122.2,pd:887,ri:48.8},
+  {a:"子供GPS｜比較サイト",t:"土屋・梶原",sy:750,sj:9111,sr:1214.8,sd:8361,py:150,pj:3804,pr:2536.0,pd:3654,ri:41.8},
+  {a:"KDDIロケーションアナライザー",t:"土屋絵理",sy:0,sj:8147,sr:'--',sd:8147,py:0,pj:1891,pr:'--',pd:1891,ri:23.2},
+  {a:"ウェルネスダイニング",t:"金野佳奈子",sy:7956,sj:7707,sr:96.9,sd:-249,py:1591,pj:1523,pr:95.7,pd:-68,ri:19.8},
+  {a:"PTハブライド",t:"木村鳳友",sy:10000,sj:7227,sr:72.3,sd:-2773,py:1500,pj:953,pr:63.5,pd:-547,ri:13.2},
+  {a:"KDDI見守りプラグ",t:"土屋・金野",sy:2500,sj:6415,sr:256.6,sd:3915,py:500,pj:1420,pr:284.0,pd:920,ri:22.1},
+  {a:"ピアス イデリアスキン",t:"金野佳奈子",sy:6500,sj:6329,sr:97.4,sd:-171,py:1300,pj:194,pr:14.9,pd:-1106,ri:3.1},
+  {a:"オムニバス業務委託",t:"梶原雅俊",sy:4500,sj:5014,sr:111.4,sd:514,py:4500,pj:4413,pr:98.1,pd:-87,ri:88.0},
+  {a:"ピアス MMA",t:"木村鳳友",sy:6000,sj:4338,sr:72.3,sd:-1662,py:1200,pj:879,pr:73.2,pd:-321,ri:20.3},
+  {a:"NTTドコモ業務委託",t:"金野佳奈子",sy:3000,sj:3475,sr:115.8,sd:475,py:3000,pj:3475,pr:115.8,pd:475,ri:100},
+  {a:"FX｜比較サイト",t:"梶原雅俊",sy:6000,sj:3130,sr:52.2,sd:-2870,py:160,pj:1383,pr:864.4,pd:1223,ri:44.2},
+  {a:"税理士比較｜比較",t:"梶原雅俊",sy:0,sj:2597,sr:'--',sd:2597,py:0,pj:383,pr:'--',pd:383,ri:14.7},
+  {a:"KDDIわんにゃんサポート",t:"土屋・金野",sy:2700,sj:2596,sr:96.1,sd:-104,py:540,pj:541,pr:100.2,pd:1,ri:20.8},
+  {a:"Cloud 9 Plus_FX",t:"深澤陽介",sy:1000,sj:2536,sr:253.6,sd:1536,py:200,pj:925,pr:462.5,pd:725,ri:36.5},
+  {a:"マイナビ エルペイン",t:"木村鳳友",sy:2400,sj:2198,sr:91.6,sd:-202,py:480,pj:434,pr:90.4,pd:-46,ri:19.7},
+  {a:"YAMAHA",t:"木村鳳友",sy:0,sj:2065,sr:'--',sd:2065,py:0,pj:384,pr:'--',pd:384,ri:18.6},
+  {a:"ILLESTBIZドラチェ",t:"木村鳳友",sy:0,sj:1946,sr:'--',sd:1946,py:0,pj:327,pr:'--',pd:327,ri:16.8},
+  {a:"JF ヘルキュット",t:"金野佳奈子",sy:1600,sj:1697,sr:106.1,sd:97,py:210,pj:268,pr:127.6,pd:58,ri:15.8},
+  {a:"JF カフェリーチェ",t:"金野佳奈子",sy:2850,sj:1695,sr:59.5,sd:-1155,py:570,pj:344,pr:60.4,pd:-226,ri:20.3},
+  {a:"JF Wシリーズ",t:"金野佳奈子",sy:2000,sj:1514,sr:75.7,sd:-486,py:260,pj:198,pr:76.2,pd:-62,ri:13.1},
+  {a:"チムスピ Synclog",t:"土屋絵理",sy:0,sj:1408,sr:'--',sd:1408,py:0,pj:200,pr:'--',pd:200,ri:14.2},
+  {a:"みずほ銀行|ADアフィ",t:"金野佳奈子",sy:0,sj:558,sr:'--',sd:558,py:0,pj:9,pr:'--',pd:9,ri:1.6},
+  {a:"JF 生スムージー",t:"金野佳奈子",sy:0,sj:512,sr:'--',sd:512,py:0,pj:54,pr:'--',pd:54,ri:10.5},
+  {a:"With Brand Project",t:"土屋絵理",sy:450,sj:359,sr:79.8,sd:-91,py:90,pj:61,pr:67.8,pd:-29,ri:17.0},
+  {a:"サンマリエ",t:"梶原・金野",sy:3600,sj:0,sr:0,sd:-3600,py:1110,pj:-6,pr:'-',pd:-1116,ri:'--'},
+  {a:"合計",t:"",sy:443246,sj:536168,sr:121.0,sd:92922,py:91596,pj:121589,pr:132.7,pd:29993,ri:22.7}
+];
+
+const A2=[
+  {a:"電通西日本 ローソン",t:"土屋・梶原・金野",sy:39900,sj:106281,sr:266.4,sd:66381,py:14880,pj:30467,pr:204.8,pd:15587,ri:28.7},
+  {a:"迅速片付け屋",t:"木村鳳友",sy:78600,sj:79925,sr:101.7,sd:1325,py:7074,pj:7825,pr:110.6,pd:751,ri:9.8},
+  {a:"PTかんたんでんき",t:"木村鳳友",sy:96000,sj:61653,sr:64.2,sd:-34347,py:14400,pj:8792,pr:61.1,pd:-5608,ri:14.3},
+  {a:"ピアス アクセーヌ",t:"木村・金野",sy:40000,sj:61592,sr:154.0,sd:21592,py:6800,pj:11457,pr:168.5,pd:4657,ri:18.6},
+  {a:"KDDIあんしんウォッチャー",t:"土屋・金野",sy:64100,sj:59802,sr:93.3,sd:-4298,py:12928,pj:14375,pr:111.2,pd:1447,ri:24.0},
+  {a:"チムスピ チームスピリット",t:"土屋絵理",sy:0,sj:28705,sr:'--',sd:28705,py:0,pj:4097,pr:'--',pd:4097,ri:14.3},
+  {a:"KDDI自転車サポート",t:"土屋・金野",sy:23150,sj:24688,sr:106.6,sd:1538,py:4750,pj:5947,pr:125.2,pd:1197,ri:24.1},
+  {a:"大和コネクト証券",t:"梶原・金野",sy:31200,sj:21146,sr:67.8,sd:-10054,py:3120,pj:2725,pr:87.3,pd:-395,ri:12.9},
+  {a:"ベクトル フクウロ",t:"土屋絵理",sy:20400,sj:20291,sr:99.5,sd:-109,py:4080,pj:4042,pr:99.1,pd:-38,ri:19.9},
+  {a:"AGAヘアクリニック",t:"木村・金野",sy:24100,sj:17284,sr:71.7,sd:-6816,py:4820,pj:2531,pr:52.5,pd:-2289,ri:14.6},
+  {a:"C&R HightFive",t:"木村・金野",sy:12000,sj:14700,sr:122.5,sd:2700,py:2400,pj:4142,pr:172.6,pd:1742,ri:28.2},
+  {a:"電通西日本 中国銀行",t:"木村・金野",sy:11750,sj:14332,sr:122.0,sd:2582,py:7385,pj:8369,pr:113.3,pd:984,ri:58.4},
+  {a:"DLsite",t:"深澤陽介",sy:9600,sj:11810,sr:123.0,sd:2210,py:4800,pj:6687,pr:139.3,pd:1887,ri:56.6},
+  {a:"子供GPS｜比較サイト",t:"土屋・梶原",sy:750,sj:11757,sr:1567.6,sd:11007,py:150,pj:4169,pr:2779.3,pd:4019,ri:35.5},
+  {a:"KDDIロケーションアナライザー",t:"土屋絵理",sy:0,sj:9952,sr:'--',sd:9952,py:0,pj:2252,pr:'--',pd:2252,ri:22.6},
+  {a:"ウェルネスダイニング",t:"金野佳奈子",sy:9556,sj:9354,sr:97.9,sd:-202,py:1911,pj:1852,pr:96.9,pd:-59,ri:19.8},
+  {a:"KDDI見守りプラグ",t:"土屋・金野",sy:3000,sj:8258,sr:275.3,sd:5258,py:600,pj:1438,pr:239.7,pd:838,ri:17.4},
+  {a:"ピアス イデリアスキン",t:"金野佳奈子",sy:8000,sj:8129,sr:101.6,sd:129,py:1600,pj:554,pr:34.6,pd:-1046,ri:6.8},
+  {a:"PTハブライド",t:"木村鳳友",sy:12000,sj:7227,sr:60.2,sd:-4773,py:1800,pj:953,pr:52.9,pd:-847,ri:13.2},
+  {a:"ピアス MMA",t:"木村鳳友",sy:7200,sj:5338,sr:74.1,sd:-1862,py:1440,pj:1079,pr:74.9,pd:-361,ri:20.2},
+  {a:"オムニバス業務委託",t:"梶原雅俊",sy:5400,sj:5014,sr:92.9,sd:-386,py:5400,pj:4413,pr:81.7,pd:-987,ri:88.0},
+  {a:"ILLESTBIZドラチェ",t:"木村鳳友",sy:0,sj:3646,sr:'--',sd:3646,py:0,pj:611,pr:'--',pd:611,ri:16.8},
+  {a:"税理士比較｜比較",t:"梶原雅俊",sy:0,sj:3597,sr:'--',sd:3597,py:0,pj:583,pr:'--',pd:583,ri:16.2},
+  {a:"NTTドコモ業務委託",t:"金野佳奈子",sy:3600,sj:3475,sr:96.5,sd:-125,py:3600,pj:3475,pr:96.5,pd:-125,ri:100},
+  {a:"FX｜比較サイト",t:"梶原雅俊",sy:7200,sj:3130,sr:43.5,sd:-4070,py:180,pj:1383,pr:768.3,pd:1203,ri:44.2},
+  {a:"Cloud 9 Plus_FX",t:"深澤陽介",sy:1200,sj:2936,sr:244.7,sd:1736,py:240,pj:965,pr:402.1,pd:725,ri:32.9},
+  {a:"KDDIわんにゃんサポート",t:"土屋・金野",sy:2700,sj:2596,sr:96.1,sd:-104,py:540,pj:541,pr:100.2,pd:1,ri:20.8},
+  {a:"クオーレ ウリエル",t:"木村鳳友",sy:0,sj:2500,sr:'--',sd:2500,py:0,pj:300,pr:'--',pd:300,ri:12.0},
+  {a:"マイナビ エルペイン",t:"木村鳳友",sy:2880,sj:2518,sr:87.4,sd:-362,py:576,pj:498,pr:86.5,pd:-78,ri:19.8},
+  {a:"YAMAHA",t:"木村鳳友",sy:0,sj:2065,sr:'--',sd:2065,py:0,pj:384,pr:'--',pd:384,ri:18.6},
+  {a:"JF ヘルキュット",t:"金野佳奈子",sy:1920,sj:1797,sr:93.6,sd:-123,py:250,pj:281,pr:112.4,pd:31,ri:15.6},
+  {a:"チムスピ Synclog",t:"土屋絵理",sy:0,sj:1761,sr:'--',sd:1761,py:0,pj:258,pr:'--',pd:258,ri:14.7},
+  {a:"JF カフェリーチェ",t:"金野佳奈子",sy:3350,sj:1695,sr:50.6,sd:-1655,py:670,pj:344,pr:51.3,pd:-326,ri:20.3},
+  {a:"KDDIおうちあんしんサポート",t:"木村鳳友",sy:0,sj:1600,sr:'--',sd:1600,py:0,pj:320,pr:'--',pd:320,ri:20.0},
+  {a:"JF Wシリーズ",t:"金野佳奈子",sy:2400,sj:1564,sr:65.2,sd:-836,py:312,pj:205,pr:65.7,pd:-107,ri:13.1},
+  {a:"みずほ銀行|ADアフィ",t:"金野佳奈子",sy:0,sj:558,sr:'--',sd:558,py:0,pj:9,pr:'--',pd:9,ri:1.6},
+  {a:"JF 生スムージー",t:"金野佳奈子",sy:0,sj:512,sr:'--',sd:512,py:0,pj:54,pr:'--',pd:54,ri:10.5},
+  {a:"With Brand Project",t:"土屋絵理",sy:450,sj:359,sr:79.8,sd:-91,py:90,pj:61,pr:67.8,pd:-29,ri:17.0},
+  {a:"サンマリエ",t:"梶原・金野",sy:4200,sj:0,sr:0,sd:-4200,py:1320,pj:-6,pr:'-',pd:-1326,ri:'--'},
+  {a:"合計",t:"",sy:526606,sj:623547,sr:118.4,sd:96941,py:108116,pj:138248,pr:127.9,pd:30132,ri:22.2}
+];
+
+const charts={};
+const initialized={p_apr:false,p_may:false,p_q1:false,p_all:false,p_k1:false,p_a1:false,p_k2:false,p_a2:false};
+
+function rb(r){
+  if(r==='--'||r===null||r===undefined||r==='-')return`<span class="rb rb-na">--</span>`;
+  const x=parseFloat(r);
+  if(isNaN(x))return`<span class="rb rb-na">${r}</span>`;
+  return`<span class="rb ${x>=100?'rb-ok':'rb-ng'}">${x.toFixed(1)}%</span>`;
+}
+function dc(v){
+  if(v===null||v===undefined||v==='--')return'<td class="dz">--</td>';
+  const x=parseFloat(v);
+  if(isNaN(x))return`<td class="dz">${v}</td>`;
+  if(x>0)return`<td class="dp">+${x.toLocaleString()}</td>`;
+  if(x<0)return`<td class="dn">${x.toLocaleString()}</td>`;
+  return`<td class="dz">0</td>`;
+}
+function sc(v,cls=''){return`<td class="col-s${cls?'':''}">${typeof v==='number'?v.toLocaleString():v}</td>`;}
+function pc(v,cls=''){return`<td class="col-p">${typeof v==='number'?v.toLocaleString():v}</td>`;}
+
+/* 個人別テーブル（売上赤系・粗利青系の2段ヘッダー） */
+function kojinTableHTML(data, isNendo){
+  const jLabel=isNendo?'見込＋実績':'実　績';
+  const thead=`<thead>
+    <tr class="grp">
+      <th class="th-base" rowspan="2" style="vertical-align:middle;text-align:left">担当者</th>
+      <th class="th-s" colspan="4">売　上</th>
+      <th class="th-p" colspan="4">粗　利</th>
+      <th class="th-base" rowspan="2" style="vertical-align:middle">粗利率</th>
+    </tr>
+    <tr class="sub">
+      <th class="th-s" style="opacity:.85">予算</th><th class="th-s" style="opacity:.85">${jLabel}</th><th class="th-s" style="opacity:.85">達成率</th><th class="th-s" style="opacity:.85">差異</th>
+      <th class="th-p" style="opacity:.85">予算</th><th class="th-p" style="opacity:.85">${jLabel}</th><th class="th-p" style="opacity:.85">達成率</th><th class="th-p" style="opacity:.85">差異</th>
+    </tr>
+  </thead>`;
+  const tbody=`<tbody>${data.map(d=>{
+    const tot=d.name==='合計';
+    return`<tr class="${tot?'total-row':''}">
+      <td>${d.name}</td>
+      <td class="col-s">${d.sy.toLocaleString()}</td><td class="col-s" style="font-weight:500">${d.sj.toLocaleString()}</td><td class="col-s">${rb(d.sr)}</td><td class="col-s">${tot?`<span class="dp">+${d.sd.toLocaleString()}</span>`:dc(d.sd).replace('<td','<span').replace('</td>','</span>')}</td>
+      <td class="col-p">${d.py.toLocaleString()}</td><td class="col-p" style="font-weight:500">${d.pj.toLocaleString()}</td><td class="col-p">${rb(d.pr)}</td><td class="col-p">${tot?`<span class="dp">+${d.pd.toLocaleString()}</span>`:dc(d.pd).replace('<td','<span').replace('</td>','</span>')}</td>
+      <td>${d.ri!=='--'?d.ri+'%':'--'}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+  return thead+tbody;
+}
+
+/* アカウント別テーブル */
+function accTableHTML(data, isNendo){
+  const jLabel=isNendo?'見込＋実績':'実　績';
+  const thead=`<thead>
+    <tr class="grp">
+      <th class="th-base" rowspan="2" style="vertical-align:middle;text-align:left">アカウント</th>
+      <th class="th-base" rowspan="2" style="vertical-align:middle;text-align:left">担当者</th>
+      <th class="th-s" colspan="4">売　上</th>
+      <th class="th-p" colspan="4">粗　利</th>
+      <th class="th-base" rowspan="2" style="vertical-align:middle">粗利率</th>
+    </tr>
+    <tr class="sub">
+      <th class="th-s" style="opacity:.85">予算</th><th class="th-s" style="opacity:.85">${jLabel}</th><th class="th-s" style="opacity:.85">達成率</th><th class="th-s" style="opacity:.85">差異</th>
+      <th class="th-p" style="opacity:.85">予算</th><th class="th-p" style="opacity:.85">${jLabel}</th><th class="th-p" style="opacity:.85">達成率</th><th class="th-p" style="opacity:.85">差異</th>
+    </tr>
+  </thead>`;
+  const tbody=`<tbody>${data.map(d=>{
+    const tot=d.a==='合計';
+    return`<tr class="${tot?'total-row':''}">
+      <td title="${d.a}" style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${d.a}</td>
+      <td style="font-size:11px;color:#888;text-align:left;max-width:80px;overflow:hidden;text-overflow:ellipsis">${d.t}</td>
+      <td class="col-s">${typeof d.sy==='number'?d.sy.toLocaleString():d.sy}</td>
+      <td class="col-s" style="font-weight:500">${typeof d.sj==='number'?d.sj.toLocaleString():d.sj}</td>
+      <td class="col-s">${rb(d.sr)}</td>
+      <td class="col-s">${dc(d.sd).replace('<td','<span').replace('class="','class="').replace('</td>','</span>').replace('<td>','<span>').replace('<td ','<span ')}</td>
+      <td class="col-p">${typeof d.py==='number'?d.py.toLocaleString():d.py}</td>
+      <td class="col-p" style="font-weight:500">${typeof d.pj==='number'?d.pj.toLocaleString():d.pj}</td>
+      <td class="col-p">${rb(d.pr)}</td>
+      <td class="col-p">${dc(d.pd).replace('<td','<span').replace('</td>','</span>').replace('<td>','<span>').replace('<td ','<span ')}</td>
+      <td>${d.ri!=='--'?d.ri+'%':'--'}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+  return thead+tbody;
+}
+
+function buildKpiStrip(d,elId){
+  const el=document.getElementById(elId);if(!el)return;
+  el.innerHTML=`
+    <div class="kpi-box"><div class="kpi-box-label">売上 実績</div><div class="kpi-box-val">${d.sj.toLocaleString()}</div><div class="kpi-box-sub" style="color:#aaa">千円</div></div>
+    <div class="kpi-box"><div class="kpi-box-label">売上 達成率</div><div class="kpi-box-val" style="color:${d.sr>=100?'#1a6b1a':'#E53225'}">${d.sr}%</div><div class="kpi-box-sub"><span class="badge ${d.sr>=100?'ok':'ng'}">${d.sr>=100?'超過':'未達'}</span></div></div>
+    <div class="kpi-box"><div class="kpi-box-label">粗利 実績</div><div class="kpi-box-val">${d.pj.toLocaleString()}</div><div class="kpi-box-sub" style="color:#aaa">千円</div></div>
+    <div class="kpi-box"><div class="kpi-box-label">粗利 達成率</div><div class="kpi-box-val" style="color:${d.pr>=100?'#1a6b1a':'#E53225'}">${d.pr}%</div><div class="kpi-box-sub"><span class="badge ${d.pr>=100?'ok':'ng'}">${d.pr>=100?'超過':'未達'}</span></div></div>`;
+}
+
+function buildBudgetPanel(key){
+  const d=BDATA[key];
+  const pid={a:'p_apr',b:'p_may',c:'p_q1',d:'p_all'}[key];
+  const el=document.getElementById(pid);
+  const sLabel={a:'実績',b:'実績＋見込',c:'Q1累計',d:'通期累計'}[key];
+  el.innerHTML=`
+  <div class="hero">
+    <div class="card">
+      <div class="hcard-label">売上 ${sLabel}</div>
+      <div class="hcard-val">${d.s.val.toLocaleString()}</div><div class="hcard-unit">千円</div>
+      <div class="hcard-rows">
+        <div><div class="mini-label">必達達成率</div><div class="mini-val" style="color:${d.s.hOk?'#181313':'#E53225'}">${d.s.h_r}%</div><span class="badge ${d.s.hOk?'ok':'ng'}">${d.s.hOk?'超過':'未達'}</span></div>
+        <div><div class="mini-label">チャレンジ達成率</div><div class="mini-val" style="color:${d.s.cOk?'#181313':'#E53225'}">${d.s.c_r}%</div><span class="badge ${d.s.cOk?'ok':'ng'}">${d.s.cOk?'超過':'未達'}</span></div>
+        <div style="grid-column:1/-1"><div class="mini-label">10期（前年）対比</div><div class="mini-val" style="color:#E53225">${d.s.y_r}%</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hcard-label">粗利 ${sLabel}</div>
+      <div class="hcard-val">${d.p.val.toLocaleString()}</div><div class="hcard-unit">千円</div>
+      <div class="hcard-rows">
+        <div><div class="mini-label">必達達成率</div><div class="mini-val" style="color:${d.p.hOk?'#181313':'#E53225'}">${d.p.h_r}%</div><span class="badge ${d.p.hOk?'ok':'ng'}">${d.p.hOk?'超過':'未達'}</span></div>
+        <div><div class="mini-label">チャレンジ達成率</div><div class="mini-val" style="color:${d.p.cOk?'#181313':'#E53225'}">${d.p.c_r}%</div><span class="badge ${d.p.cOk?'ok':'ng'}">${d.p.cOk?'超過':'未達'}</span></div>
+        <div style="grid-column:1/-1"><div class="mini-label">10期（前年）対比</div><div class="mini-val" style="color:#E53225">${d.p.y_r}%</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec-label">予算達成進捗</div>
+  ${d.prog.map(p=>`<div class="prog-row">
+    <div class="prog-head"><span class="prog-name">${p.n}</span><span class="prog-meta">${p.a.toLocaleString()} / ${p.b.toLocaleString()}千円<span class="prog-pct" style="color:${p.ok?'#181313':'#E53225'}"> ${p.r}%</span></span></div>
+    <div class="bar-bg"><div class="bar-fill" style="width:${p.ok?100:Math.min(p.r,100)}%;background:${p.ok?'#181313':'#E53225'}"></div></div>
+  </div>`).join('')}
+  <div class="divider"></div>
+  <div class="leg">
+    <span><span class="dot" style="background:${RC}"></span>実績＋見込</span>
+    <span><span class="dot" style="background:${BC};border:1px solid #888"></span>必達予算</span>
+    <span><span class="dot" style="background:${CC}"></span>チャレンジ予算</span>
+    <span><span class="dot" style="background:${GC}"></span>10期実績</span>
+  </div>
+  <div class="chart-wrap"><canvas id="ch_${key}" role="img" aria-label="${d.title}売上粗利比較"></canvas></div>`;
+  setTimeout(()=>{
+    const cv=document.getElementById('ch_'+key);if(!cv)return;
+    if(charts['ch_'+key])charts['ch_'+key].destroy();
+    charts['ch_'+key]=new Chart(cv,{type:'bar',
+      data:{labels:d.labels,datasets:[
+        {label:'実績＋見込',data:d.actual,backgroundColor:RC,borderRadius:0,borderSkipped:false},
+        {label:'必達予算',data:d.hissatsu,backgroundColor:'rgba(0,0,0,0)',borderColor:BC,borderWidth:2,borderRadius:0,borderSkipped:false},
+        {label:'チャレンジ予算',data:d.challenge,backgroundColor:CC,borderRadius:0,borderSkipped:false},
+        {label:'10期実績',data:d.jukki,backgroundColor:GC,borderRadius:0,borderSkipped:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()+'千円'}}},
+        scales:{
+          x:{ticks:{autoSkip:false,font:{size:12},color:'#888'},grid:{display:false},border:{color:'#e0ddd6'}},
+          y:{ticks:{font:{size:11},color:'#888',callback:v=>v.toLocaleString()},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}}
+        }
+      }
+    });
+  },80);
+}
+
+function buildKojinChart(data,cid){
+  const cv=document.getElementById(cid);if(!cv)return;
+  if(charts[cid])charts[cid].destroy();
+  const m=data.filter(d=>d.name!=='合計');
+  charts[cid]=new Chart(cv,{type:'bar',
+    data:{labels:m.map(d=>d.name),datasets:[
+      {label:'実績',data:m.map(d=>d.sj),backgroundColor:RC,borderRadius:0,borderSkipped:false},
+      {label:'予算',data:m.map(d=>d.sy),backgroundColor:BC,borderRadius:0,borderSkipped:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()+'千円'}}},
+      scales:{
+        x:{ticks:{autoSkip:false,font:{size:12},color:'#888'},grid:{display:false},border:{color:'#e0ddd6'}},
+        y:{ticks:{font:{size:11},color:'#888',callback:v=>v.toLocaleString()},grid:{color:'rgba(0,0,0,0.04)'},border:{display:false}}
+      }
+    }
+  });
+}
+
+const INIT={
+  p_apr:()=>buildBudgetPanel('a'),
+  p_may:()=>buildBudgetPanel('b'),
+  p_q1: ()=>buildBudgetPanel('c'),
+  p_all:()=>buildBudgetPanel('d'),
+  p_k1:()=>{
+    const t=K1[K1.length-1];
+    buildKpiStrip({sj:t.sj,sr:t.sr,pj:t.pj,pr:t.pr},'kpi_k1');
+    document.getElementById('tbl_k1').innerHTML=kojinTableHTML(K1,false);
+    setTimeout(()=>buildKojinChart(K1,'ck1'),80);
+  },
+  p_a1:()=>{
+    const t=A1[A1.length-1];
+    buildKpiStrip({sj:t.sj,sr:t.sr,pj:t.pj,pr:t.pr},'kpi_a1');
+    document.getElementById('tbl_a1').innerHTML=accTableHTML(A1,false);
+  },
+  p_k2:()=>{
+    const t=K2[K2.length-1];
+    buildKpiStrip({sj:t.sj,sr:t.sr,pj:t.pj,pr:t.pr},'kpi_k2');
+    document.getElementById('tbl_k2').innerHTML=kojinTableHTML(K2,true);
+    setTimeout(()=>buildKojinChart(K2,'ck2'),80);
+  },
+  p_a2:()=>{
+    const t=A2[A2.length-1];
+    buildKpiStrip({sj:t.sj,sr:t.sr,pj:t.pj,pr:t.pr},'kpi_a2');
+    document.getElementById('tbl_a2').innerHTML=accTableHTML(A2,true);
+  }
+};
+
+function sw(pid,btn){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(pid).classList.add('on');
+  btn.classList.add('on');
+  if(!initialized[pid]){initialized[pid]=true;INIT[pid]&&INIT[pid]();}
+}
+initialized['p_apr']=true;INIT['p_apr']();
+</script>
